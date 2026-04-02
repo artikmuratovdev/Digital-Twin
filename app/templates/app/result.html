@@ -210,28 +210,15 @@
 
             <section class="card card-full">
                 <div class="section-head">
-                    <h2>AI yordamchi</h2>
-                    <p>AI xulosa va savol-javob o'zbek tilida ishlaydi.</p>
+                    <h2>To'liq AI xulosa</h2>
+                    <p>AI bemorning holati va riskini to'liq matnli xulosa qilib beradi.</p>
                 </div>
-                <div class="ai-grid">
-                    <div class="ai-panel">
-                        <div class="panel-head">
-                            <h3>AI xulosa</h3>
-                            <button id="summaryBtn" class="btn btn-secondary" type="button">Xulosa olish</button>
-                        </div>
-                        <div id="summaryOutput" class="output-box">{{ initial_summary }}</div>
+                <div class="ai-panel ai-panel-full">
+                    <div class="panel-head">
+                        <h3>Xulosa</h3>
+                        <button id="summaryBtn" class="btn btn-secondary" type="button">Xulosa olish</button>
                     </div>
-                    <div class="ai-panel">
-                        <div class="panel-head">
-                            <h3>AI chat</h3>
-                        </div>
-                        <form id="chatForm" class="chat-form">
-                            {% csrf_token %}
-                            {{ ai_chat_form.message }}
-                            <button type="submit" class="btn btn-primary">Savol yuborish</button>
-                        </form>
-                        <div id="chatOutput" class="output-box">Savol bering. Javob ehtiyotkor va o'zbek tilida qaytadi.</div>
-                    </div>
+                    <div id="summaryOutput" class="output-box ai-summary-box">{{ initial_summary }}</div>
                 </div>
             </section>
         </main>
