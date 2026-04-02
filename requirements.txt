@@ -1,9 +1,8 @@
-pandas
-numpy
-scikit-learn
-xgboost
-joblib
-shap
-fastapi
-uvicorn
-matplotlib
+Django==5.2.7
+joblib==1.5.2
+matplotlib==3.10.8
+numpy==2.3.3
+pandas==2.3.2
+scikit-learn==1.7.2
+shap==0.48.0
+xgboost==3.0.4

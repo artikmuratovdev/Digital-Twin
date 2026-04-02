@@ -1,0 +1,264 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Twin for Diabetes</title>
+    <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body data-patient-id="{{ patient.id }}">
+    <div class="layout">
+        <header class="hero">
+            <div>
+                <p class="eyebrow">Hackathon MVP</p>
+                <h1>Digital Twin for Diabetes</h1>
+                <p class="subtitle">Qandli diabet uchun virtual bemor simulyatsiyasi</p>
+                <p class="hero-text">Bemorning joriy holati, xavfi, simulyatsiya natijasi va AI yordamini bitta oynada ko'ring.</p>
+            </div>
+            <div class="hero-actions">
+                <a href="{% url 'home' %}" class="btn btn-secondary">Dashboard</a>
+                <a href="{% url 'patient_create' %}" class="btn btn-secondary">Yangi bemor</a>
+            </div>
+        </header>
+
+        {% if model_error %}
+            <section class="banner banner-warning">
+                <strong>{{ model_error }}</strong>
+            </section>
+        {% endif %}
+
+        <main class="grid">
+            <section class="card card-wide">
+                <div class="section-head">
+                    <h2>Joriy bemor ma'lumotlari</h2>
+                    <p>Saqlangan ko'rsatkichlar quyida ko'rsatilgan.</p>
+                </div>
+                <div class="patient-grid">
+                    <div class="mini-card"><span>Glyukoza</span><strong>{{ patient.glucose }}</strong></div>
+                    <div class="mini-card"><span>BMI</span><strong>{{ patient.bmi }}</strong></div>
+                    <div class="mini-card"><span>Yosh</span><strong>{{ patient.age }}</strong></div>
+                    <div class="mini-card"><span>Insulin</span><strong>{{ patient.insulin }}</strong></div>
+                    <div class="mini-card"><span>Qon bosimi</span><strong>{{ patient.blood_pressure }}</strong></div>
+                    <div class="mini-card"><span>Irsiy ko'rsatkich</span><strong>{{ patient.pedigree }}</strong></div>
+                </div>
+            </section>
+
+            <section class="card risk-card">
+                <div class="section-head">
+                    <h2>Joriy risk</h2>
+                </div>
+                {% if risk_result %}
+                    <div class="risk-score">{{ risk_result.score_percent }}%</div>
+                    <span class="risk-badge risk-{{ risk_result.risk_level|lower|cut:"'" }}">{{ risk_result.risk_level }}</span>
+                    <p class="muted">{{ warning_text }}</p>
+                {% else %}
+                    <p class="muted">Riskni ko'rish uchun avval model tayyor bo'lishi kerak.</p>
+                {% endif %}
+            </section>
+
+            <section id="simulation-section" class="card card-wide">
+                <div class="section-head">
+                    <h2>Simulyatsiya</h2>
+                    <p>Yangilangan holatni kiriting va eski hamda yangi riskni solishtiring.</p>
+                </div>
+                {% if simulation_data or latest_simulation %}
+                    <div class="section-head simulation-head">
+                        <h3>So'nggi simulyatsiya natijasi</h3>
+                        <p>Eski va yangi risklar quyida aniq ko'rsatilgan.</p>
+                    </div>
+                {% endif %}
+
+                {% if simulation_data %}
+                    <div class="simulation-grid simulation-grid-strong">
+                        <div class="mini-card mini-card-highlight">
+                            <span>Oldingi risk</span>
+                            <strong>{{ simulation_data.old_risk_percent|floatformat:2 }}%</strong>
+                            <small class="muted">{{ simulation_data.old_risk_level }}</small>
+                        </div>
+                        <div class="mini-card mini-card-highlight">
+                            <span>Yangi risk</span>
+                            <strong>{{ simulation_data.new_risk_percent|floatformat:2 }}%</strong>
+                            <small class="muted">{{ simulation_data.new_risk_level }}</small>
+                        </div>
+                        <div class="mini-card mini-card-highlight">
+                            <span>Farq</span>
+                            <strong class="{% if simulation_data.difference_percent <= 0 %}good{% else %}bad{% endif %}">
+                                {{ simulation_data.difference_percent|floatformat:2 }}%
+                            </strong>
+                            <small class="muted">{% if simulation_data.difference_percent <= 0 %}Yaxshilanish{% else %}Oshgan{% endif %}</small>
+                        </div>
+                    </div>
+                {% elif latest_simulation %}
+                    <div class="simulation-grid simulation-grid-strong">
+                        <div class="mini-card mini-card-highlight">
+                            <span>Oldingi risk</span>
+                            <strong>{{ latest_simulation.old_risk|floatformat:2 }}%</strong>
+                            <small class="muted">Saqlangan natija</small>
+                        </div>
+                        <div class="mini-card mini-card-highlight">
+                            <span>Yangi risk</span>
+                            <strong>{{ latest_simulation.new_risk|floatformat:2 }}%</strong>
+                            <small class="muted">Saqlangan natija</small>
+                        </div>
+                        <div class="mini-card mini-card-highlight">
+                            <span>Farq</span>
+                            <strong class="{% if latest_simulation.difference <= 0 %}good{% else %}bad{% endif %}">
+                                {{ latest_simulation.difference|floatformat:2 }}%
+                            </strong>
+                            <small class="muted">{% if latest_simulation.difference <= 0 %}Yaxshilanish{% else %}Oshgan{% endif %}</small>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="empty-note">
+                        <strong>Simulyatsiya hali bajarilmagan.</strong>
+                        <p class="muted">Pastdagi formani to'ldirib, eski va yangi riskni solishtirishingiz mumkin.</p>
+                    </div>
+                {% endif %}
+
+                <div class="section-head simulation-form-head">
+                    <h3>Yangi ma'lumotlarni kiriting</h3>
+                    <p>Quyidagi maydonlarni o'zgartirib, yangi riskni hisoblang.</p>
+                </div>
+                <form method="post" action="{% url 'simulate' patient.id %}" class="form-grid form-surface">
+                    {% csrf_token %}
+                    {% for field in simulation_form %}
+                        <div class="field">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <small class="error">{{ field.errors|join:", " }}</small>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Simulyatsiya qilish</button>
+                    </div>
+                </form>
+
+                <div class="section-head simulation-history-head">
+                    <h3>Simulyatsiyalar tarixi</h3>
+                    <p>So'nggi simulyatsiyalar natijalarini jadvalda ko'ring.</p>
+                </div>
+                {% if simulation_records %}
+                    <div class="table-wrap">
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Sana</th>
+                                    <th>Eski risk</th>
+                                    <th>Yangi risk</th>
+                                    <th>Farq</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in simulation_records %}
+                                    <tr>
+                                        <td>{{ item.created_at|date:"Y-m-d H:i" }}</td>
+                                        <td>{{ item.old_risk|floatformat:2 }}%</td>
+                                        <td>{{ item.new_risk|floatformat:2 }}%</td>
+                                        <td>
+                                            <span class="{% if item.difference <= 0 %}good{% else %}bad{% endif %}">
+                                                {{ item.difference|floatformat:2 }}%
+                                            </span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="muted">Hali simulyatsiyalar saqlanmagan.</p>
+                {% endif %}
+            </section>
+
+            <section class="card">
+                <div class="section-head">
+                    <h2>SHAP izohi</h2>
+                    <p>Eng muhim omillar.</p>
+                </div>
+                {% if explanations %}
+                    <div class="factor-list">
+                        {% for item in explanations %}
+                            <div class="factor-item">
+                                <div>
+                                    <strong>{{ item.label }}</strong>
+                                    <p>Qiymat: {{ item.value }}</p>
+                                </div>
+                                <div class="factor-meta">
+                                    <span>{{ item.direction }}</span>
+                                    <strong>{{ item.signed_impact }}</strong>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="muted">Izoh ko'rsatish uchun model tayyor bo'lishi kerak.</p>
+                {% endif %}
+            </section>
+
+            <section class="card">
+                <div class="section-head">
+                    <h2>Tarix qo'shish</h2>
+                    <p>Glyukoza va BMI tarixini kengaytiring.</p>
+                </div>
+                <form method="post" action="{% url 'add_history' patient.id %}" class="form-grid compact-grid">
+                    {% csrf_token %}
+                    {% for field in history_form %}
+                        <div class="field">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-secondary">Tarixga saqlash</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="card card-wide">
+                <div class="section-head">
+                    <h2>Tarixiy trend</h2>
+                    <p>Glyukoza va BMI o'zgarishini ko'ring.</p>
+                </div>
+                <div class="chart-wrap">
+                    <canvas id="historyChart" height="120"></canvas>
+                </div>
+                <p id="historyChartEmpty" class="muted" hidden>Trend ko'rsatish uchun tarixiy ma'lumot yetarli emas.</p>
+            </section>
+
+            <section class="card card-wide">
+                <div class="section-head">
+                    <h2>AI yordamchi</h2>
+                    <p>AI xulosa va savol-javob o'zbek tilida ishlaydi.</p>
+                </div>
+                <div class="ai-grid">
+                    <div class="ai-panel">
+                        <div class="panel-head">
+                            <h3>AI xulosa</h3>
+                            <button id="summaryBtn" class="btn btn-secondary" type="button">Xulosa olish</button>
+                        </div>
+                        <div id="summaryOutput" class="output-box">{{ initial_summary }}</div>
+                    </div>
+                    <div class="ai-panel">
+                        <div class="panel-head">
+                            <h3>AI chat</h3>
+                        </div>
+                        <form id="chatForm" class="chat-form">
+                            {% csrf_token %}
+                            {{ ai_chat_form.message }}
+                            <button type="submit" class="btn btn-primary">Savol yuborish</button>
+                        </form>
+                        <div id="chatOutput" class="output-box">Savol bering. Javob ehtiyotkor va o'zbek tilida qaytadi.</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    {{ chart_data|json_script:"chart-data" }}
+    <script src="{% static 'app/js/chart.js' %}"></script>
+    <script src="{% static 'app/js/main.js' %}"></script>
+</body>
+</html>

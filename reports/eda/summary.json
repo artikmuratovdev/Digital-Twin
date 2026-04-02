@@ -1,0 +1,110 @@
+{
+  "dataset_path": "C:\\Users\\Asus\\Desktop\\Digital Twin\\data\\diabetes.csv",
+  "cleaned_dataset_path": "C:\\Users\\Asus\\Desktop\\Digital Twin\\data\\diabetes_cleaned.csv",
+  "rows": 768,
+  "columns": 8,
+  "duplicate_rows_before_cleaning": 0,
+  "duplicate_rows_after_cleaning": 0,
+  "missing_values_before_cleaning": {
+    "Glucose": 0,
+    "BloodPressure": 0,
+    "SkinThickness": 0,
+    "Insulin": 0,
+    "BMI": 0,
+    "DiabetesPedigreeFunction": 0,
+    "Age": 0,
+    "Outcome": 0
+  },
+  "missing_values_after_cleaning": {
+    "Glucose": 0,
+    "BloodPressure": 0,
+    "SkinThickness": 0,
+    "Insulin": 0,
+    "BMI": 0,
+    "DiabetesPedigreeFunction": 0,
+    "Age": 0,
+    "Outcome": 0
+  },
+  "invalid_zero_values_before_cleaning": {
+    "Glucose": 5,
+    "BloodPressure": 35,
+    "SkinThickness": 227,
+    "Insulin": 374,
+    "BMI": 11
+  },
+  "invalid_zero_values_after_cleaning": {
+    "Glucose": 0,
+    "BloodPressure": 0,
+    "SkinThickness": 0,
+    "Insulin": 0,
+    "BMI": 0
+  },
+  "outlier_counts_before_cleaning": {
+    "Glucose": 5,
+    "BloodPressure": 45,
+    "SkinThickness": 1,
+    "Insulin": 34,
+    "BMI": 19,
+    "DiabetesPedigreeFunction": 29,
+    "Age": 9,
+    "Outcome": 0
+  },
+  "outlier_counts_after_cleaning": {
+    "Glucose": 0,
+    "BloodPressure": 0,
+    "SkinThickness": 87,
+    "Insulin": 346,
+    "BMI": 0,
+    "DiabetesPedigreeFunction": 0,
+    "Age": 0,
+    "Outcome": 0
+  },
+  "preprocessing_artifacts": {
+    "filled_with_median": {
+      "Glucose": 117.0,
+      "BloodPressure": 72.0,
+      "SkinThickness": 29.0,
+      "Insulin": 125.0,
+      "BMI": 32.3,
+      "DiabetesPedigreeFunction": 0.3725,
+      "Age": 29.0
+    },
+    "clip_bounds": {
+      "Glucose": {
+        "lower": 36.0,
+        "upper": 204.0
+      },
+      "BloodPressure": {
+        "lower": 40.0,
+        "upper": 104.0
+      },
+      "SkinThickness": {
+        "lower": 1.0,
+        "upper": 57.0
+      },
+      "Insulin": {
+        "lower": -94.375,
+        "upper": 360.625
+      },
+      "BMI": {
+        "lower": 13.849999999999998,
+        "upper": 50.25
+      },
+      "DiabetesPedigreeFunction": {
+        "lower": -0.32999999999999996,
+        "upper": 1.2
+      },
+      "Age": {
+        "lower": -1.5,
+        "upper": 66.5
+      }
+    }
+  },
+  "plots": {
+    "distributions": "C:\\Users\\Asus\\Desktop\\Digital Twin\\reports\\eda\\distributions.png",
+    "boxplots": "C:\\Users\\Asus\\Desktop\\Digital Twin\\reports\\eda\\boxplots.png",
+    "correlation_heatmap": "C:\\Users\\Asus\\Desktop\\Digital Twin\\reports\\eda\\correlation_heatmap.png",
+    "data_quality": "C:\\Users\\Asus\\Desktop\\Digital Twin\\reports\\eda\\data_quality.png",
+    "outcome_balance": "C:\\Users\\Asus\\Desktop\\Digital Twin\\reports\\eda\\outcome_balance.png"
+  }
+}

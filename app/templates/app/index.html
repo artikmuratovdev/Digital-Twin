@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Twin for Diabetes</title>
+    <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
+</head>
+<body>
+    <div class="layout">
+        <header class="hero">
+            <div>
+                <p class="eyebrow">Patient Dashboard</p>
+                <h1>Bemorlar boshqaruvi</h1>
+                <p class="subtitle">Saqlangan bemorlar, risk va tezkor kirish bir joyda</p>
+                <p class="hero-text">
+                    Dashboard orqali barcha bemorlarni jadval ko'rinishida ko'ring, kerakli bemorni oching yoki yangi bemor qo'shing.
+                </p>
+            </div>
+            <div class="hero-actions">
+                <a href="{% url 'patient_create' %}" class="btn btn-primary">Yangi bemor qo'shish</a>
+            </div>
+        </header>
+
+        <main>
+            <section class="card">
+                <div class="section-head">
+                    <h2>Bemorlar dashboard</h2>
+                    <p>Jadval orqali bemorlarni solishtiring va kerakli yozuvni oching.</p>
+                </div>
+                {% if patients %}
+                    <div class="table-wrap">
+                        <table class="dashboard-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Sana</th>
+                                    <th>Glyukoza</th>
+                                    <th>BMI</th>
+                                    <th>Yosh</th>
+                                    <th>Insulin</th>
+                                    <th>Qon bosimi</th>
+                                    <th>Risk</th>
+                                    <th>Amal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in patients %}
+                                    <tr>
+                                        <td>#{{ item.patient.id }}</td>
+                                        <td>{{ item.patient.created_at|date:"Y-m-d H:i" }}</td>
+                                        <td>{{ item.patient.glucose }}</td>
+                                        <td>{{ item.patient.bmi }}</td>
+                                        <td>{{ item.patient.age }}</td>
+                                        <td>{{ item.patient.insulin }}</td>
+                                        <td>{{ item.patient.blood_pressure }}</td>
+                                        <td>
+                                            {% if item.risk_result %}
+                                                <span class="table-risk risk-{{ item.risk_result.risk_level|lower|cut:"'" }}">
+                                                    {{ item.risk_result.score_percent }}%
+                                                </span>
+                                            {% else %}
+                                                <span class="muted">Mavjud emas</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{{ item.detail_url }}" class="btn btn-secondary btn-sm">Ochish</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="muted">Hali bemorlar saqlanmagan.</p>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+</body>
+</html>

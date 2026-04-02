@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat</title>
+    <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
+</head>
+<body>
+    <div class="layout narrow">
+        <section class="card">
+            <div class="section-head">
+                <h1>AI chat sahifasi</h1>
+                <p>Asosiy AI xulosa va chat bloki `result.html` ichida ishlatiladi.</p>
+                <a href="{% url 'home' %}" class="btn btn-secondary">Bosh sahifaga qaytish</a>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
+

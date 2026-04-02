@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yangi bemor | Digital Twin for Diabetes</title>
+    <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
+</head>
+<body>
+    <div class="layout narrow">
+        <header class="hero">
+            <div>
+                <p class="eyebrow">New Patient</p>
+                <h1>Yangi bemor ma'lumotlari</h1>
+                <p class="subtitle">Riskni hisoblash uchun ko'rsatkichlarni kiriting</p>
+                <p class="hero-text">
+                    Forma alohida sahifaga ajratildi, shuning uchun dashboard endi faqat bemorlarni boshqarish uchun xizmat qiladi.
+                </p>
+            </div>
+            <div class="hero-actions">
+                <a href="{% url 'home' %}" class="btn btn-secondary">Dashboard</a>
+            </div>
+        </header>
+
+        <section class="card">
+            <div class="section-head">
+                <h2>Bemor ma'lumotlari</h2>
+                <p>Quyidagi ko'rsatkichlarni kiriting va riskni hisoblang.</p>
+            </div>
+            <form method="post" action="{% url 'predict' %}" class="form-grid">
+                {% csrf_token %}
+                {% for field in patient_form %}
+                    <div class="field">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                            <small class="error">{{ field.errors|join:", " }}</small>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Riskni hisoblash</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</body>
+</html>
