@@ -105,6 +105,7 @@ h1 {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
+    position: relative;
 }
 
 .card {
@@ -115,8 +116,33 @@ h1 {
     box-shadow: var(--shadow);
 }
 
+.shap-card {
+    align-self: start;
+    position: sticky;
+    top: 24px;
+    max-height: calc(100vh - 48px);
+    overflow: auto;
+}
+
+.patient-info-card {
+    background: linear-gradient(145deg, #edf7ff 0%, #f8fcff 52%, #eefaf6 100%);
+    border-color: #cfe0ef;
+}
+
 .card-wide {
     grid-column: span 2;
+}
+
+.simulation-shap-row {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(300px, 1fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.simulation-shap-row > .card {
+    min-width: 0;
 }
 
 .card-full {
@@ -228,8 +254,8 @@ h1 {
 
 .dashboard-table thead th {
     text-align: left;
-    padding: 16px 18px;
-    font-size: 13px;
+    padding: 12px 14px;
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--primary-dark);
@@ -237,7 +263,7 @@ h1 {
 }
 
 .dashboard-table tbody td {
-    padding: 16px 18px;
+    padding: 11px 14px;
     border-top: 1px solid #e7eef6;
     vertical-align: middle;
 }
@@ -266,6 +292,11 @@ h1 {
     gap: 14px;
 }
 
+.simulation-section-card {
+    background: linear-gradient(155deg, #fffdf8 0%, #f6fbff 50%, #f1f8ff 100%);
+    border-color: #d8e4f1;
+}
+
 .simulation-head {
     margin-top: 8px;
 }
@@ -282,6 +313,163 @@ h1 {
     margin-top: 24px;
 }
 
+.simulation-panel {
+    padding: 18px 20px;
+    border: 1px solid #d7e3f0;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.simulation-panel-header {
+    background: linear-gradient(180deg, rgba(237, 245, 255, 0.95) 0%, rgba(248, 251, 255, 0.95) 100%);
+}
+
+.simulation-results-panel {
+    background: linear-gradient(180deg, rgba(241, 248, 255, 0.96) 0%, rgba(251, 253, 255, 0.96) 100%);
+}
+
+.simulation-form-panel {
+    border-color: #cfdff0;
+    background: linear-gradient(180deg, #ffffff 0%, #f4f9ff 100%);
+    box-shadow: 0 10px 26px rgba(41, 91, 145, 0.08);
+}
+
+.simulation-history-text {
+    margin-bottom: 12px;
+    color: var(--muted);
+}
+
+.simulation-table-wrap {
+    border-color: #cfddec;
+    background: linear-gradient(180deg, #ffffff 0%, #f4f9ff 100%);
+}
+
+.simulation-table-wrap .dashboard-table {
+    min-width: 760px;
+}
+
+.simulation-table-wrap .dashboard-table thead th {
+    padding: 10px 12px;
+}
+
+.simulation-table-wrap .dashboard-table tbody td {
+    padding: 10px 12px;
+}
+
+.simulation-chart-wrap {
+    min-height: 340px;
+    padding: 10px 4px 0;
+}
+
+.simulation-chart-host {
+    width: 100%;
+    position: relative;
+}
+
+.simulation-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 10px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.simulation-chart-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.simulation-chart-swatch {
+    display: inline-block;
+    width: 18px;
+    height: 4px;
+    border-radius: 999px;
+}
+
+.simulation-chart-swatch-dashed {
+    background-image: repeating-linear-gradient(
+        90deg,
+        currentColor 0,
+        currentColor 8px,
+        transparent 8px,
+        transparent 12px
+    );
+    background-color: transparent !important;
+}
+
+.simulation-chart-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.simulation-chart-grid {
+    stroke: #d9e5f0;
+    stroke-width: 1;
+}
+
+.simulation-chart-axis {
+    stroke: #8aa2bb;
+    stroke-width: 1.2;
+}
+
+.simulation-chart-tick {
+    stroke: #8aa2bb;
+    stroke-width: 1;
+}
+
+.simulation-chart-axis-label {
+    fill: #5f738a;
+    font-size: 12px;
+}
+
+.simulation-chart-hit-area {
+    cursor: pointer;
+}
+
+.simulation-chart-point {
+    pointer-events: none;
+}
+
+.simulation-chart-tooltip {
+    position: absolute;
+    z-index: 5;
+    min-width: 190px;
+    padding: 10px 12px;
+    border: 1px solid #c8d8ea;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 12px 28px rgba(26, 63, 104, 0.16);
+    color: var(--text);
+    pointer-events: none;
+}
+
+.simulation-chart-tooltip strong {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+.simulation-chart-tooltip span {
+    display: block;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.simulation-chart-tooltip-diff-positive {
+    color: #0e7c53;
+    font-weight: 700;
+}
+
+.simulation-chart-tooltip-diff-negative {
+    color: #b23131;
+    font-weight: 700;
+}
+
 .form-surface {
     padding: 18px;
     border: 1px solid var(--border);
@@ -294,6 +482,40 @@ h1 {
     border-radius: 18px;
     border: 1px solid var(--border);
     background: #f8fbff;
+}
+
+.patient-metric {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.metric-glucose {
+    background: linear-gradient(180deg, #fff1e4 0%, #fff9f2 100%);
+    border-color: #f0cfb0;
+}
+
+.metric-bmi {
+    background: linear-gradient(180deg, #eef8ea 0%, #f8fcf6 100%);
+    border-color: #cbe4bf;
+}
+
+.metric-age {
+    background: linear-gradient(180deg, #f3efff 0%, #fbf9ff 100%);
+    border-color: #d5cbf1;
+}
+
+.metric-insulin {
+    background: linear-gradient(180deg, #e9f7f7 0%, #f7fcfc 100%);
+    border-color: #bfe1e1;
+}
+
+.metric-pressure {
+    background: linear-gradient(180deg, #fff0f0 0%, #fff8f8 100%);
+    border-color: #efc6c6;
+}
+
+.metric-pedigree {
+    background: linear-gradient(180deg, #eef3ff 0%, #f8faff 100%);
+    border-color: #cad7f0;
 }
 
 .mini-card span {
@@ -316,6 +538,46 @@ h1 {
     border-color: #c8ddf0;
 }
 
+.simulation-metric {
+    position: relative;
+    overflow: hidden;
+}
+
+.simulation-metric::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 6px;
+    border-radius: 18px 0 0 18px;
+}
+
+.simulation-metric-old {
+    background: linear-gradient(180deg, #fff3e8 0%, #fffaf5 100%);
+    border-color: #efcaa7;
+}
+
+.simulation-metric-old::before {
+    background: #e39b4f;
+}
+
+.simulation-metric-new {
+    background: linear-gradient(180deg, #ebf8ef 0%, #f8fcf9 100%);
+    border-color: #bfdcc6;
+}
+
+.simulation-metric-new::before {
+    background: #25a36f;
+}
+
+.simulation-metric-diff {
+    background: linear-gradient(180deg, #edf4ff 0%, #f8fbff 100%);
+    border-color: #c9d8ef;
+}
+
+.simulation-metric-diff::before {
+    background: #497fd1;
+}
+
 .empty-note {
     margin-bottom: 20px;
     padding: 16px 18px;
@@ -328,10 +590,37 @@ h1 {
     background: linear-gradient(180deg, #eff7ff 0%, #f8fbff 100%);
 }
 
+.risk-card-past {
+    background: linear-gradient(180deg, #eaf8f1 0%, #f7fcf9 100%);
+    border-color: #bfe2d0;
+}
+
+.risk-card-orta {
+    background: linear-gradient(180deg, #fff6e2 0%, #fffbf3 100%);
+    border-color: #efd39a;
+}
+
+.risk-card-yuqori {
+    background: linear-gradient(180deg, #ffebeb 0%, #fff7f7 100%);
+    border-color: #efc1c1;
+}
+
 .risk-score {
     font-size: 48px;
     font-weight: 800;
     margin-bottom: 14px;
+}
+
+.risk-score-past {
+    color: #0e7c53;
+}
+
+.risk-score-orta {
+    color: #9c6b02;
+}
+
+.risk-score-yuqori {
+    color: #b23131;
 }
 
 .risk-badge {
@@ -366,22 +655,112 @@ h1 {
 .factor-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 12px;
-    padding: 14px 16px;
+    padding: 12px 16px;
     border: 1px solid var(--border);
     border-radius: 18px;
     background: #f9fbfd;
+    position: relative;
+    overflow: hidden;
+}
+
+.factor-item > div:first-child {
+    flex: 1;
+}
+
+.factor-item strong {
+    display: block;
+    line-height: 1.25;
+}
+
+.factor-item p {
+    margin-bottom: 0;
+    line-height: 1.35;
+}
+
+.factor-item::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 6px;
+    border-radius: 18px 0 0 18px;
+}
+
+.factor-item-up {
+    background: linear-gradient(180deg, #fff1f1 0%, #fff9f9 100%);
+    border-color: #efcaca;
+}
+
+.factor-item-up::before {
+    background: #cf4e4e;
+}
+
+.factor-item-down {
+    background: linear-gradient(180deg, #ecf8f1 0%, #f8fcfa 100%);
+    border-color: #c8e1d1;
+}
+
+.factor-item-down::before {
+    background: #1e8b60;
 }
 
 .factor-meta {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
     text-align: right;
+    min-width: 148px;
+    padding: 7px 12px;
+    border-radius: 14px;
 }
 
 .factor-meta span {
     display: block;
     color: var(--muted);
-    margin-bottom: 6px;
-    font-size: 13px;
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.factor-direction {
+    font-weight: 700;
+}
+
+.factor-direction-up {
+    color: #b23131;
+}
+
+.factor-direction-down {
+    color: #0e7c53;
+}
+
+.factor-impact {
+    font-size: 17px;
+    line-height: 1.2;
+}
+
+.factor-meta-up {
+    background: #fde9e9;
+}
+
+.factor-meta-up strong {
+    color: #b23131;
+}
+
+.factor-meta-down {
+    background: #e7f6ee;
+}
+
+.factor-meta-down strong {
+    color: #0e7c53;
+}
+
+.factor-impact-up {
+    color: #b23131;
+}
+
+.factor-impact-down {
+    color: #0e7c53;
 }
 
 .ai-grid {
@@ -437,6 +816,7 @@ h1 {
 
 @media (max-width: 1024px) {
     .grid,
+    .simulation-shap-row,
     .form-grid,
     .compact-grid,
     .patient-grid,
@@ -447,6 +827,12 @@ h1 {
 
     .card-wide {
         grid-column: span 1;
+    }
+
+    .shap-card {
+        position: static;
+        max-height: none;
+        overflow: visible;
     }
 }
 

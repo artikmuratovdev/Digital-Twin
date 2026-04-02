@@ -18,17 +18,34 @@ MODEL_NOT_READY_MESSAGE = "Model hali tayyor emas. Avval training scriptni ishga
 WARNING_TEXT = "Bu tashxis emas, faqat xavf baholash natijasi."
 
 
-def _history_chart_data(patient: Patient) -> dict:
-    items = list(patient.history.all())
+def _simulation_difference(old_risk: float, new_risk: float) -> float:
+    return round(float(old_risk) - float(new_risk), 2)
+
+
+def _with_display_difference(item: SimulationResult | None) -> SimulationResult | None:
+    if item is None:
+        return None
+    item.display_difference = _simulation_difference(item.old_risk, item.new_risk)
+    return item
+
+
+def _simulation_chart_data(patient: Patient) -> dict:
+    items = list(patient.simulations.all()[:10])
+    items.reverse()
     return {
-        "labels": [item.date.strftime("%Y-%m-%d") for item in items],
-        "glucose": [item.glucose for item in items],
-        "bmi": [item.bmi for item in items],
+        "labels": [item.created_at.strftime("%Y-%m-%d %H:%M") for item in items],
+        "old_risk": [float(item.old_risk) for item in items],
+        "new_risk": [float(item.new_risk) for item in items],
+        "difference": [_simulation_difference(item.old_risk, item.new_risk) for item in items],
     }
 
 
+def _simulation_records(patient: Patient) -> list[SimulationResult]:
+    return [_with_display_difference(item) for item in patient.simulations.all()[:10]]
+
+
 def _build_dashboard_context(patient: Patient) -> dict:
-    latest_simulation = patient.simulations.first()
+    latest_simulation = _with_display_difference(patient.simulations.first())
     simulation_initial = {
         "glucose": latest_simulation.glucose if latest_simulation and latest_simulation.glucose is not None else patient.glucose,
         "blood_pressure": latest_simulation.blood_pressure if latest_simulation and latest_simulation.blood_pressure is not None else patient.blood_pressure,
@@ -44,8 +61,8 @@ def _build_dashboard_context(patient: Patient) -> dict:
         "history_form": HistoryForm(),
         "ai_chat_form": AIChatForm(),
         "history_records": list(patient.history.all()),
-        "simulation_records": list(patient.simulations.all()[:10]),
-        "chart_data": _history_chart_data(patient),
+        "simulation_records": _simulation_records(patient),
+        "simulation_chart_data": _simulation_chart_data(patient),
         "latest_simulation": latest_simulation,
         "warning_text": WARNING_TEXT,
         "model_ready": True,
@@ -146,9 +163,10 @@ def patient_detail_view(request, patient_id: int):
                 new_risk=simulation["new_risk_percent"],
                 difference=simulation["difference_percent"],
             )
-            context["latest_simulation"] = saved_result
+            context["latest_simulation"] = _with_display_difference(saved_result)
             context["simulation_data"] = simulation
-            context["simulation_records"] = list(patient.simulations.all()[:10])
+            context["simulation_records"] = _simulation_records(patient)
+            context["simulation_chart_data"] = _simulation_chart_data(patient)
             context["simulation_form"] = SimulationForm(
                 initial={
                     "glucose": saved_result.glucose,

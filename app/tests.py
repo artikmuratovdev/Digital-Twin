@@ -10,9 +10,40 @@ from .services.analyze_data import analyze_dataset
 from .services.ai_chat import generate_ai_chat_reply
 from .services.ai_summary import generate_ai_summary
 from .services.preprocess import apply_preprocessing, build_preprocessing_artifacts
+from .forms import PatientForm, SimulationForm
 
 
 class SmokeTests(TestCase):
+    def test_patient_form_rejects_zero_and_out_of_range_values(self):
+        form = PatientForm(
+            data={
+                "glucose": 0,
+                "blood_pressure": 250,
+                "skin_thickness": 20,
+                "insulin": 80,
+                "bmi": 28.4,
+                "pedigree": 0.43,
+                "age": 35,
+            }
+        )
+        self.assertFalse(form.is_valid())
+        self.assertIn("glucose", form.errors)
+        self.assertIn("blood_pressure", form.errors)
+
+    def test_simulation_form_rejects_zero_values(self):
+        form = SimulationForm(
+            data={
+                "glucose": 110,
+                "blood_pressure": 72,
+                "skin_thickness": 0,
+                "insulin": 80,
+                "bmi": 26.8,
+                "age": 34,
+            }
+        )
+        self.assertFalse(form.is_valid())
+        self.assertIn("skin_thickness", form.errors)
+
     def test_home_page_loads(self):
         response = self.client.get(reverse("home"))
         self.assertEqual(response.status_code, 200)

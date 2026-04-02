@@ -12,7 +12,7 @@ MODEL_PATH = BASE_DIR / "models" / "model.pkl"
 FEATURE_LABELS = {
     "Glucose": "Glyukoza",
     "BloodPressure": "Qon bosimi",
-    "SkinThickness": "Teri qalinligi",
+    "SkinThickness": "Teri osti yog'lari",
     "Insulin": "Insulin",
     "BMI": "BMI",
     "DiabetesPedigreeFunction": "Irsiy moyillik ko'rsatkichi",

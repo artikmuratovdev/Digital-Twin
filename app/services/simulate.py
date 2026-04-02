@@ -11,7 +11,7 @@ def simulate_patient_state(
     updated_result = predict_risk(updated_state)
 
     difference = round(
-        float(updated_result["score_percent"]) - float(original_result["score_percent"]),
+        float(original_result["score_percent"]) - float(updated_result["score_percent"]),
         2,
     )
 
