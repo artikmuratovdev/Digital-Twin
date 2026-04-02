@@ -28,25 +28,25 @@ def _history_chart_data(patient: Patient) -> dict:
 
 
 def _build_dashboard_context(patient: Patient) -> dict:
+    latest_simulation = patient.simulations.first()
+    simulation_initial = {
+        "glucose": latest_simulation.glucose if latest_simulation and latest_simulation.glucose is not None else patient.glucose,
+        "blood_pressure": latest_simulation.blood_pressure if latest_simulation and latest_simulation.blood_pressure is not None else patient.blood_pressure,
+        "skin_thickness": latest_simulation.skin_thickness if latest_simulation and latest_simulation.skin_thickness is not None else patient.skin_thickness,
+        "insulin": latest_simulation.insulin if latest_simulation and latest_simulation.insulin is not None else patient.insulin,
+        "bmi": latest_simulation.bmi if latest_simulation and latest_simulation.bmi is not None else patient.bmi,
+        "age": latest_simulation.age if latest_simulation and latest_simulation.age is not None else patient.age,
+    }
     context = {
         "patient": patient,
         "patient_form": PatientForm(instance=patient),
-        "simulation_form": SimulationForm(
-            initial={
-                "glucose": patient.glucose,
-                "blood_pressure": patient.blood_pressure,
-                "skin_thickness": patient.skin_thickness,
-                "insulin": patient.insulin,
-                "bmi": patient.bmi,
-                "age": patient.age,
-            }
-        ),
+        "simulation_form": SimulationForm(initial=simulation_initial),
         "history_form": HistoryForm(),
         "ai_chat_form": AIChatForm(),
         "history_records": list(patient.history.all()),
         "simulation_records": list(patient.simulations.all()[:10]),
         "chart_data": _history_chart_data(patient),
-        "latest_simulation": patient.simulations.first(),
+        "latest_simulation": latest_simulation,
         "warning_text": WARNING_TEXT,
         "model_ready": True,
         "model_error": "",
@@ -114,6 +114,58 @@ def patient_create_view(request):
 def patient_detail_view(request, patient_id: int):
     patient = get_object_or_404(Patient, pk=patient_id)
     context = _build_dashboard_context(patient)
+
+    if request.method == "POST":
+        form = SimulationForm(request.POST)
+        if not form.is_valid():
+            context["simulation_form"] = form
+            return render(request, "app/result.html", context)
+
+        original_state = patient_to_payload(patient)
+        updated_state = {
+            "Glucose": form.cleaned_data["glucose"],
+            "BloodPressure": form.cleaned_data["blood_pressure"],
+            "SkinThickness": form.cleaned_data["skin_thickness"],
+            "Insulin": form.cleaned_data["insulin"],
+            "BMI": form.cleaned_data["bmi"],
+            "DiabetesPedigreeFunction": patient.pedigree,
+            "Age": form.cleaned_data["age"],
+        }
+
+        try:
+            simulation = simulate_patient_state(original_state, updated_state)
+            saved_result = SimulationResult.objects.create(
+                patient=patient,
+                glucose=form.cleaned_data["glucose"],
+                blood_pressure=form.cleaned_data["blood_pressure"],
+                skin_thickness=form.cleaned_data["skin_thickness"],
+                insulin=form.cleaned_data["insulin"],
+                bmi=form.cleaned_data["bmi"],
+                age=form.cleaned_data["age"],
+                old_risk=simulation["old_risk_percent"],
+                new_risk=simulation["new_risk_percent"],
+                difference=simulation["difference_percent"],
+            )
+            context["latest_simulation"] = saved_result
+            context["simulation_data"] = simulation
+            context["simulation_records"] = list(patient.simulations.all()[:10])
+            context["simulation_form"] = SimulationForm(
+                initial={
+                    "glucose": saved_result.glucose,
+                    "blood_pressure": saved_result.blood_pressure,
+                    "skin_thickness": saved_result.skin_thickness,
+                    "insulin": saved_result.insulin,
+                    "bmi": saved_result.bmi,
+                    "age": saved_result.age,
+                }
+            )
+        except ModelNotReadyError as exc:
+            context["model_ready"] = False
+            context["model_error"] = str(exc) or MODEL_NOT_READY_MESSAGE
+
+        if "simulation_form" not in context:
+            context["simulation_form"] = form
+
     return render(request, "app/result.html", context)
 
 
@@ -142,41 +194,7 @@ def predict_view(request):
 
 @require_POST
 def simulate_view(request, patient_id: int):
-    patient = get_object_or_404(Patient, pk=patient_id)
-    form = SimulationForm(request.POST)
-    context = _build_dashboard_context(patient)
-
-    if not form.is_valid():
-        context["simulation_form"] = form
-        return render(request, "app/result.html", context)
-
-    original_state = patient_to_payload(patient)
-    updated_state = {
-        "Glucose": form.cleaned_data["glucose"],
-        "BloodPressure": form.cleaned_data["blood_pressure"],
-        "SkinThickness": form.cleaned_data["skin_thickness"],
-        "Insulin": form.cleaned_data["insulin"],
-        "BMI": form.cleaned_data["bmi"],
-        "DiabetesPedigreeFunction": patient.pedigree,
-        "Age": form.cleaned_data["age"],
-    }
-
-    try:
-        simulation = simulate_patient_state(original_state, updated_state)
-        saved_result = SimulationResult.objects.create(
-            patient=patient,
-            old_risk=simulation["old_risk_percent"],
-            new_risk=simulation["new_risk_percent"],
-            difference=simulation["difference_percent"],
-        )
-        context["latest_simulation"] = saved_result
-        context["simulation_data"] = simulation
-    except ModelNotReadyError as exc:
-        context["model_ready"] = False
-        context["model_error"] = str(exc) or MODEL_NOT_READY_MESSAGE
-
-    context["simulation_form"] = form
-    return render(request, "app/result.html", context)
+    return redirect(f"{reverse('patient_detail', args=[patient_id])}#simulation-section")
 
 
 @require_POST

@@ -92,6 +92,71 @@ class SmokeTests(TestCase):
         self.assertContains(response, "9,60%")
         self.assertContains(response, 'id="simulation-section"', html=False)
 
+    def test_patient_detail_prefills_simulation_form_from_latest_simulation(self):
+        patient = Patient.objects.create(
+            glucose=118,
+            blood_pressure=74,
+            skin_thickness=22,
+            insulin=86,
+            bmi=28.4,
+            pedigree=0.43,
+            age=35,
+        )
+        SimulationResult.objects.create(
+            patient=patient,
+            glucose=109,
+            blood_pressure=70,
+            skin_thickness=19,
+            insulin=77,
+            bmi=25.9,
+            age=33,
+            old_risk=12.4,
+            new_risk=10.1,
+            difference=-2.3,
+        )
+        response = self.client.get(reverse("patient_detail", args=[patient.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'value="109.0"', html=False)
+        self.assertContains(response, 'value="70.0"', html=False)
+        self.assertContains(response, 'value="19.0"', html=False)
+        self.assertContains(response, 'value="77.0"', html=False)
+        self.assertContains(response, 'value="25.9"', html=False)
+        self.assertContains(response, 'value="33"', html=False)
+
+    def test_patient_detail_handles_simulation_post_without_url_change(self):
+        patient = Patient.objects.create(
+            glucose=118,
+            blood_pressure=74,
+            skin_thickness=22,
+            insulin=86,
+            bmi=28.4,
+            pedigree=0.43,
+            age=35,
+        )
+        response = self.client.post(
+            reverse("patient_detail", args=[patient.id]),
+            {
+                "glucose": 110,
+                "blood_pressure": 72,
+                "skin_thickness": 20,
+                "insulin": 80,
+                "bmi": 26.8,
+                "age": 34,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "So'nggi simulyatsiya natijasi")
+        self.assertEqual(SimulationResult.objects.filter(patient=patient).count(), 1)
+        saved_result = SimulationResult.objects.get(patient=patient)
+        self.assertEqual(saved_result.glucose, 110)
+        self.assertEqual(saved_result.blood_pressure, 72)
+        self.assertEqual(saved_result.skin_thickness, 20)
+        self.assertEqual(saved_result.insulin, 80)
+        self.assertEqual(saved_result.bmi, 26.8)
+        self.assertEqual(saved_result.age, 34)
+        self.assertContains(response, f"{saved_result.old_risk:.2f}%".replace(".", ","))
+        self.assertContains(response, f"{saved_result.new_risk:.2f}%".replace(".", ","))
+
     def test_local_ai_summary_uses_rule_based_response(self):
         patient = Patient.objects.create(
             glucose=145,

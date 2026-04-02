@@ -33,6 +33,12 @@ class PatientHistory(models.Model):
 
 class SimulationResult(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="simulations")
+    glucose = models.FloatField(null=True, blank=True)
+    blood_pressure = models.FloatField(null=True, blank=True)
+    skin_thickness = models.FloatField(null=True, blank=True)
+    insulin = models.FloatField(null=True, blank=True)
+    bmi = models.FloatField(null=True, blank=True)
+    age = models.PositiveIntegerField(null=True, blank=True)
     old_risk = models.FloatField()
     new_risk = models.FloatField()
     difference = models.FloatField()

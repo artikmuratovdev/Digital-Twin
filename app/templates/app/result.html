@@ -121,7 +121,7 @@
                     <h3>Yangi ma'lumotlarni kiriting</h3>
                     <p>Quyidagi maydonlarni o'zgartirib, yangi riskni hisoblang.</p>
                 </div>
-                <form method="post" action="{% url 'simulate' patient.id %}" class="form-grid form-surface">
+                <form method="post" action="{% url 'patient_detail' patient.id %}#simulation-section" class="form-grid form-surface">
                     {% csrf_token %}
                     {% for field in simulation_form %}
                         <div class="field">
